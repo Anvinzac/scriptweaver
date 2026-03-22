@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Check, X, AlignLeft } from 'lucide-react';
 
-export default function TapToSwapEditor({ text, onSave, onCancel }) {
+export default function TapToSwapEditor({ text, onSave, onCancel, inline = false }) {
   const [words, setWords] = useState(text.split(' '));
   const [editingIdx, setEditingIdx] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -36,6 +36,10 @@ export default function TapToSwapEditor({ text, onSave, onCancel }) {
     setWords(newWords);
     setEditingIdx(null);
     setInputValue('');
+    // Auto-save in inline mode
+    if (inline) {
+      onSave(newWords.join(' '));
+    }
   };
 
   const cancelWord = () => {
@@ -64,22 +68,32 @@ export default function TapToSwapEditor({ text, onSave, onCancel }) {
         />
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onSave(rawText)}
+            onClick={() => {
+              onSave(rawText);
+              if (inline) {
+                setRawMode(false);
+                setWords(rawText.split(' '));
+              }
+            }}
             className="flex items-center gap-1 text-xs font-medium text-white bg-gradient-to-r from-glow-start to-glow-end px-3 py-1.5 rounded-lg active:scale-95 transition-transform"
           >
             <Check size={12} />
             Save
           </button>
-          <button
-            onClick={onCancel}
-            className="text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray"
-          >
-            Cancel
-          </button>
+          {!inline && (
+            <button
+              onClick={onCancel}
+              className="text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray"
+            >
+              Cancel
+            </button>
+          )}
           <button
             onClick={() => {
               setRawMode(false);
-              setWords(rawText.split(' '));
+              const newWords = rawText.split(' ');
+              setWords(newWords);
+              if (inline) onSave(rawText);
             }}
             className="text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray ml-auto"
           >
@@ -121,25 +135,29 @@ export default function TapToSwapEditor({ text, onSave, onCancel }) {
 
       {/* Actions */}
       <div className="flex items-center gap-2 mt-1">
-        <button
-          onClick={() => onSave(words.join(' '))}
-          className="flex items-center gap-1 text-xs font-medium text-white bg-gradient-to-r from-glow-start to-glow-end px-3 py-1.5 rounded-lg active:scale-95 transition-transform"
-        >
-          <Check size={12} />
-          Save
-        </button>
-        <button
-          onClick={onCancel}
-          className="text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray"
-        >
-          Cancel
-        </button>
+        {!inline && (
+          <>
+            <button
+              onClick={() => onSave(words.join(' '))}
+              className="flex items-center gap-1 text-xs font-medium text-white bg-gradient-to-r from-glow-start to-glow-end px-3 py-1.5 rounded-lg active:scale-95 transition-transform"
+            >
+              <Check size={12} />
+              Save
+            </button>
+            <button
+              onClick={onCancel}
+              className="text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray"
+            >
+              Cancel
+            </button>
+          </>
+        )}
         <button
           onClick={() => {
             setRawMode(true);
             setRawText(words.join(' '));
           }}
-          className="flex items-center gap-1 text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray ml-auto"
+          className={`flex items-center gap-1 text-xs font-medium text-ink-light px-3 py-1.5 rounded-lg hover:bg-warm-gray ${inline ? '' : 'ml-auto'}`}
         >
           <AlignLeft size={12} />
           Raw Text

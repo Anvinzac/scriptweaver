@@ -84,6 +84,36 @@ const useScriptStore = create(
         }),
       })),
 
+    // Update topic title
+    updateScriptTitle: (scriptId, title) =>
+      set((state) => ({
+        userScripts: state.userScripts.map((s) =>
+          s.id === scriptId ? { ...s, title } : s
+        ),
+      })),
+
+    // Update chapter title
+    updateChapterTitle: (chapterId, title) =>
+      set((state) => ({
+        userScripts: state.userScripts.map((s) => ({
+          ...s,
+          chapters: s.chapters.map((c) =>
+            c.id === chapterId ? { ...c, title } : c
+          ),
+        })),
+      })),
+
+    // Update chapter description
+    updateChapterDescription: (chapterId, description) =>
+      set((state) => ({
+        userScripts: state.userScripts.map((s) => ({
+          ...s,
+          chapters: s.chapters.map((c) =>
+            c.id === chapterId ? { ...c, description } : c
+          ),
+        })),
+      })),
+
     // Current script helper
     getScript: () => {
       const state = get();

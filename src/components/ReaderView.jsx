@@ -26,7 +26,7 @@ function ExampleSection({ idea, chapterId }) {
   const saveCaptionEdit = () => { updateIdeaCaption(idea.id, captionText.trim()); setEditingCaption(false); };
 
   return (
-    <div className="border-b border-amber-400/10">
+    <div className="border-b border-amber-400/10 animate-fade-in-up">
       {/* Example header — amber themed */}
       <div className="flex items-center gap-2 px-4 py-3 bg-amber-400/[0.04]">
         <button
@@ -155,7 +155,7 @@ function IdeaSection({ idea, chapterId, selectedBlockId, selectBlock, globalInde
   const sentenceCount = idea.sentenceBlocks.length;
 
   return (
-    <div className="border-b border-white/5">
+    <div className="border-b border-white/5 animate-fade-in-up">
       {/* Idea header */}
       <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.03]">
         <button
@@ -218,11 +218,12 @@ function IdeaSection({ idea, chapterId, selectedBlockId, selectBlock, globalInde
                 <button
                   key={sb.id}
                   onClick={() => selectBlock(sb.id)}
-                  className={`w-full text-left pl-9 pr-5 py-3 border-b border-white/[0.04] transition-colors duration-100 flex items-start gap-3 ${
+                  className={`w-full text-left pl-9 pr-5 py-3 border-b border-white/[0.04] transition-colors duration-100 flex items-start gap-3 animate-fade-in-up ${
                     isSelected
                       ? 'bg-highlight border-l-2 border-l-accent'
                       : 'active:bg-warm-gray/50'
                   }`}
+                  style={{ animationDelay: `${idx * 30}ms` }}
                 >
                   <span className="text-[11px] font-mono text-ink-light/25 pt-0.5 w-5 flex-shrink-0 text-right">
                     {idx}
