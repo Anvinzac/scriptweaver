@@ -85,24 +85,29 @@ function EditPopup({ title, value, onSave, onClose, multiline = false }) {
 
 function TopicCard({ script, stats, isSelected, demoMode, onTap, onDoubleTap }) {
   const lastTap = useRef(0);
+  const tapTimer = useRef(null);
 
-  const handleClick = (e) => {
+  const handleTap = (e) => {
+    e.preventDefault();
     const now = Date.now();
-    if (now - lastTap.current < 300) {
-      e.preventDefault();
-      e.stopPropagation();
-      onDoubleTap();
+    if (now - lastTap.current < 400) {
+      // Double tap detected
+      clearTimeout(tapTimer.current);
       lastTap.current = 0;
+      onDoubleTap();
     } else {
       lastTap.current = now;
-      onTap();
+      // Delay single tap to wait for possible double tap
+      tapTimer.current = setTimeout(() => {
+        onTap();
+      }, 400);
     }
   };
 
   return (
     <button
-      onClick={handleClick}
-      className={`relative w-full rounded-xl overflow-hidden aspect-[4/3] group active:scale-[0.97] transition-all duration-150 ${
+      onClick={handleTap}
+      className={`relative w-full rounded-xl overflow-hidden aspect-[4/3] group active:scale-[0.97] transition-all duration-150 touch-manipulation ${
         isSelected ? 'ring-2 ring-cyan-400/60 ring-offset-1 ring-offset-transparent' : ''
       }`}
     >
@@ -124,38 +129,38 @@ function TopicCard({ script, stats, isSelected, demoMode, onTap, onDoubleTap }) 
 function ChapterCard({ chapter, stats, demoMode, onTap, onDoubleTapTitle, onDoubleTapDesc }) {
   const lastTap = useRef(0);
   const lastTapTarget = useRef(null);
+  const tapTimer = useRef(null);
 
-  const handleClick = (e) => {
+  const handleTap = (e) => {
+    e.preventDefault();
     const now = Date.now();
     const target = e.target.closest('[data-field]');
     const field = target?.dataset?.field;
 
-    if (now - lastTap.current < 300 && !demoMode) {
-      e.preventDefault();
-      e.stopPropagation();
+    if (now - lastTap.current < 400 && !demoMode) {
+      // Double tap detected
+      clearTimeout(tapTimer.current);
+      lastTap.current = 0;
       if (field === 'desc' || lastTapTarget.current === 'desc') {
         onDoubleTapDesc();
       } else {
         onDoubleTapTitle();
       }
-      lastTap.current = 0;
       lastTapTarget.current = null;
     } else {
       lastTap.current = now;
       lastTapTarget.current = field;
-      // Delay single tap to distinguish from double tap
-      setTimeout(() => {
-        if (lastTap.current === now) {
-          onTap();
-        }
-      }, 300);
+      // Delay single tap to wait for possible double tap
+      tapTimer.current = setTimeout(() => {
+        onTap();
+      }, 400);
     }
   };
 
   return (
     <div
-      onClick={handleClick}
-      className="relative w-full rounded-xl overflow-hidden group active:scale-[0.97] transition-transform duration-100 cursor-pointer"
+      onClick={handleTap}
+      className="relative w-full rounded-xl overflow-hidden group active:scale-[0.97] transition-transform duration-100 cursor-pointer touch-manipulation"
     >
       <img src={chapter.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/25" />
